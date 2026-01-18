@@ -195,7 +195,7 @@
     reader.onload = async () => {
       const base64 = reader.result.split(",")[1];
 
-      await fetch("https://garaga-n8n.ru/webhook-test/telegram-upload", {
+      await fetch("https://garaga-n8n.ru/webhook/telegram-upload", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -210,7 +210,15 @@
           select4: select4.value,
           telegram_user: tg.initDataUnsafe?.user || null
         })
-      });
+      })
+      .then(() => {
+        alert('Задача сохранёна ✅');
+        tg.close();
+      })
+      .catch(err => {
+        console.error('SAVE ERROR:', err);
+        alert('Ошибка сохранения. Попробуйте ещё раз.');
+      });;
 
       //tg.close();
     };

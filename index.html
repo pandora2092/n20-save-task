@@ -1,58 +1,151 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8" />
-  <title>Задача для генерации</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
 
-  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+<title>Загрузка</title>
 
-  <style>
-    body {
-      font-family: system-ui, sans-serif;
-      background: #fff;
-      padding: 16px;
-    }
-    input, select, textarea, button {
-      width: 100%;
-      margin-bottom: 12px;
-      padding: 12px;
-      font-size: 16px;
-    }
-    button {
-      background: #000;
-      color: #fff;
-      border: none;
-      border-radius: 8px;
-    }
-  </style>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+<style>
+  :root {
+    --bg: var(--tg-theme-bg-color, #ffffff);
+    --text: var(--tg-theme-text-color, #000000);
+    --hint: var(--tg-theme-hint-color, #888888);
+    --button: var(--tg-theme-button-color, #000000);
+    --button-text: var(--tg-theme-button-text-color, #ffffff);
+    --card: #f6f6f6;
+    --radius: 14px;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    margin: 0;
+    padding: env(safe-area-inset-top) 16px env(safe-area-inset-bottom);
+    font-family: system-ui, -apple-system, BlinkMacSystemFont;
+    background: var(--bg);
+    color: var(--text);
+  }
+
+  h1 {
+    font-size: 20px;
+    margin-bottom: 16px;
+  }
+
+  .card {
+    background: var(--card);
+    border-radius: var(--radius);
+    padding: 16px;
+    margin-bottom: 14px;
+  }
+
+  label {
+    font-size: 13px;
+    color: var(--hint);
+    margin-bottom: 6px;
+    display: block;
+  }
+
+  input, select, textarea {
+    width: 100%;
+    padding: 14px;
+    border-radius: var(--radius);
+    border: none;
+    font-size: 16px;
+    background: #fff;
+  }
+
+  textarea {
+    resize: none;
+  }
+
+  input[type="file"] {
+    padding: 12px;
+  }
+
+  button {
+    width: 100%;
+    padding: 16px;
+    border-radius: var(--radius);
+    border: none;
+    background: var(--button);
+    color: var(--button-text);
+    font-size: 16px;
+    font-weight: 600;
+    margin-top: 10px;
+  }
+
+  .preview {
+    width: 100%;
+    height: 180px;
+    background: #eaeaea;
+    border-radius: var(--radius);
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+
+  .preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+</style>
 </head>
+
 <body>
 
-  <input type="file" id="photo" accept="image/*" required>
+<h1>Загрузка данных</h1>
 
-  <input type="text" id="text1" placeholder="Опишите УТП продукта" required>
-  <input type="text" id="text2" placeholder="Дополнительная информация" required>
+<div class="card">
+  <label>Фото</label>
+  <div class="preview" id="preview">Нет фото</div>
+  <input type="file" id="photo" accept="image/*">
+</div>
 
+<div class="card">
+  <label>УТП продукта</label>
+  <input type="text" id="text1" placeholder="Опишите УТП продукта">
+</div>
+
+<div class="card">
+  <label>Дополнительная информация</label>
+  <textarea id="text2" rows="3" placeholder="Дополнительная информация"></textarea>
+</div>
+
+<div class="card">
+  <label>Формат</label>
   <select id="select1">
-    <option value="">Формат</option>
+    <option value="">Выберите</option>
     <option>руки в кадре</option>
     <option>говорящая голова</option>
     <option>демонстрация продукта</option>
     <option>персонаж с продуктом в кадре</option>
   </select>
+</div>
 
+<div class="card">
+  <label>Жанр</label>
   <select id="select2">
-    <option value="">Жанр</option>
+    <option value="">Выберите</option>
     <option>FAQ-контент</option>
     <option>обзор на продукт</option>
     <option>личный опыт покупателя</option>
     <option>до/после</option>
     <option>ритуал ухода</option>
   </select>
+</div>
 
+<div class="card">
+  <label>Тон</label>
   <select id="select3">
-    <option value="">Тон</option>
+    <option value="">Выберите</option>
     <option>ugc контент</option>
     <option>экспертный</option>
     <option>лайфстайл</option>
@@ -60,9 +153,12 @@
     <option>продающий</option>
     <option>обучающий</option>
   </select>
+</div>
 
+<div class="card">
+  <label>Цель</label>
   <select id="select4">
-    <option value="">Цель</option>
+    <option value="">Выберите</option>
     <option>продажи</option>
     <option>узнаваемость</option>
     <option>доверие</option>
@@ -70,47 +166,54 @@
     <option>анонс новинки</option>
     <option>привлечь внимание</option>
   </select>
+</div>
 
-  <button onclick="send()">Отправить</button>
+<button onclick="send()">Отправить</button>
 
 <script>
   const tg = window.Telegram.WebApp;
   tg.expand();
 
+  const photoInput = document.getElementById("photo");
+  const preview = document.getElementById("preview");
+
+  photoInput.addEventListener("change", () => {
+    const file = photoInput.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      preview.innerHTML = `<img src="${reader.result}" />`;
+    };
+    reader.readAsDataURL(file);
+  });
+
   function send() {
-    const file = document.getElementById("photo").files[0];
-    if (!file) return alert("Загрузите фото");
+    const file = photoInput.files[0];
+    if (!file) return alert("Добавьте фото");
 
     const reader = new FileReader();
-
     reader.onload = async () => {
       const base64 = reader.result.split(",")[1];
-
-      const payload = {
-        photo: base64,
-        photo_name: file.name,
-        photo_type: file.type,
-
-        text1: document.getElementById("text1").value,
-        text2: document.getElementById("text2").value,
-
-        select1: document.getElementById("select1").value,
-        select2: document.getElementById("select2").value,
-        select3: document.getElementById("select3").value,
-        select4: document.getElementById("select4").value,
-
-        telegram_user: tg.initDataUnsafe?.user || null
-      };
 
       await fetch("https://garaga-n8n.ru/webhook-test/telegram-upload", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
+        body: JSON.stringify({
+          photo: base64,
+          photo_name: file.name,
+          photo_type: file.type,
+          text1: text1.value,
+          text2: text2.value,
+          select1: select1.value,
+          select2: select2.value,
+          select3: select3.value,
+          select4: select4.value,
+          telegram_user: tg.initDataUnsafe?.user || null
+        })
       });
 
       //tg.close();
     };
-
     reader.readAsDataURL(file);
   }
 </script>

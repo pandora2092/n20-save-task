@@ -147,7 +147,7 @@
 
 <body>
 
-<!-- Лоадер -->
+  <!-- Лоадер -->
 <div id="loader">
   <div class="spinner"></div>
 </div>
@@ -162,21 +162,28 @@
 
 <div class="card">
   <label>УТП продукта</label>
-  <p>Почему клиент должен выбрать именно этот продукт</p>
+  <p>УТП продукта — это уникальное торговое предложение.
+Простой смысл: ответ на вопрос «почему клиент должен выбрать именно этот продукт, а не любой другой».</p>
   <input type="text" id="text1" placeholder="Опишите УТП продукта">
 </div>
 
 <div class="card">
   <label>Формат</label>
+  <p>Формат отвечает за визуальное кадрирование.</p>
+  <p>В формате "руки в кадре", акцент на продукте и руках. Озвучка закадровая.</p>
+  <p>В формате "персонаж с продуктом в кадре", акцент на продукте и персонаже. Персонаж говорит в кадре.</p>
   <select id="select1">
     <option value="">Выберите</option>
     <option>руки в кадре</option>
+    <!-- <option>говорящая голова</option> -->
+    <!-- <option>демонстрация продукта</option> -->
     <option>персонаж с продуктом в кадре</option>
   </select>
 </div>
 
 <div class="card">
   <label>Жанр</label>
+  <p>Жанр отвечает через какую тему будет раскрыто УТП продукта.</p>
   <select id="select2">
     <option value="">Выберите</option>
     <option>FAQ-контент</option>
@@ -189,11 +196,13 @@
 
 <div class="card">
   <label>Дополнительная информация</label>
+  <p>Любая дополнительная информация о продутке для того, чтобы раскрыть тему жанра. Можно указать предпочтения по локации</p>
   <textarea id="text2" rows="3" placeholder="Дополнительная информация"></textarea>
 </div>
 
 <div class="card">
   <label>Тон</label>
+  <p>Тон отвечает за подачу материала.</p>
   <select id="select3">
     <option value="">Выберите</option>
     <option>ugc контент</option>
@@ -207,6 +216,7 @@
 
 <div class="card">
   <label>Цель</label>
+  <p>Цель отвечает за главную маркетинговую задачу рекламного ролика.</p>
   <select id="select4">
     <option value="">Выберите</option>
     <option>продажи</option>
@@ -226,18 +236,17 @@
 
   const photoInput = document.getElementById("photo");
   const preview = document.getElementById("preview");
-  const loader = document.getElementById("loader");
 
-  const showLoader = () => loader.style.display = "flex";
-  const hideLoader = () => loader.style.display = "none";
+  const loader = document.getElementById('loader');
+  const showLoader = () => loader.style.display = 'flex';
+  const hideLoader = () => loader.style.display = 'none';
 
   photoInput.addEventListener("change", () => {
     const file = photoInput.files[0];
     if (!file) return;
-
     const reader = new FileReader();
     reader.onload = () => {
-      preview.innerHTML = `<img src="${reader.result}">`;
+      preview.innerHTML = `<img src="${reader.result}" />`;
     };
     reader.readAsDataURL(file);
   });
@@ -246,14 +255,17 @@
     if (!validateForm()) return;
 
     showLoader();
-
     const file = photoInput.files[0];
-    const reader = new FileReader();
+    if (!file) {
+      return alert("Добавьте фото");
+      hideLoader();
+    };
 
+    const reader = new FileReader();
     reader.onload = async () => {
       const base64 = reader.result.split(",")[1];
 
-      fetch("https://garaga-n8n.ru/webhook/telegram-upload", {
+      await fetch("https://garaga-n8n.ru/webhook/telegram-upload", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -270,38 +282,50 @@
         })
       })
       .then(() => {
-        alert("Задача сохранена ✅");
+        alert('Задача сохранёна ✅');
         tg.close();
       })
-      .catch(() => {
-        alert("Ошибка сохранения");
+      .catch(err => {
+        console.error('SAVE ERROR:', err);
+        alert('Ошибка сохранения. Попробуйте ещё раз.');
       })
       .finally(() => {
         hideLoader();
       });
-    };
 
+    };
     reader.readAsDataURL(file);
   }
 
+
   function validateForm() {
     let valid = true;
-    const fields = [photoInput, text1, select1, select2, select3, select4];
 
-    fields.forEach(field => {
-      field.classList.remove("error");
+    const requiredFields = [
+      photoInput,
+      text1,
+      select1,
+      select2,
+      select3,
+      select4
+    ];
+
+    requiredFields.forEach(field => {
+      field.classList.remove('error');
 
       if (
-        (field.type === "file" && !field.files.length) ||
-        (field.tagName === "SELECT" && !field.value) ||
-        (field.tagName === "INPUT" && !field.value.trim())
+        (field.type === 'file' && !field.files.length) ||
+        (field.tagName === 'SELECT' && !field.value) ||
+        (field.tagName !== 'SELECT' && field.type !== 'file' && !field.value.trim())
       ) {
-        field.classList.add("error");
+        field.classList.add('error');
         valid = false;
       }
     });
 
-    if (!valid) alert("Заполните все обязательные поля");
+    if (!valid) {
+      alert('Пожалуйста, заполните все обязательные поля');
+    }
 
     return valid;
   }
